@@ -323,3 +323,46 @@ module Academic_institution = struct
       ~format:Yaml_frontmatter ~label:"Academic Institution" ~folder:path
       ~fields ()
 end
+
+module Workshop = struct
+  type role = [%import: Ood.Workshop.role]
+
+  let role_of_yaml = function
+    | `String s -> Ok (Ood.Workshop.role_of_string s)
+    | _ -> Error (`Msg "failed to parse role, expected string")
+
+  let role_to_yaml role = `String (Ood.Workshop.role_to_string role)
+
+  type important_date = [%import: Ood.Workshop.important_date] [@@deriving yaml]
+
+  type committee_member = [%import: Ood.Workshop.committee_member]
+  [@@deriving yaml]
+
+  type presentation = [%import: Ood.Workshop.presentation] [@@deriving yaml]
+
+  type t = [%import: Ood.Workshop.t] [@@deriving yaml]
+
+  let path = "data/workshops/en"
+
+  let widget_of_t =
+    Widget.
+      [
+        `String (String.make ~required:true ~label:"Name" ~name:"name" ());
+        `Text
+          (Text.make ~required:true ~label:"Description" ~name:"description" ());
+        `String (String.make ~required:true ~label:"Website" ~name:"url" ());
+        `String (String.make ~required:false ~label:"Logo" ~name:"logo" ());
+        `String
+          (String.make ~required:true ~label:"Continent" ~name:"continent" ());
+        `List (Lst.make ~required:true ~label:"Course" ~name:"course" ());
+        `List (Lst.make ~required:false ~label:"Location" ~name:"location" ());
+        `Markdown Markdown.(make ~label:"Body" ~name:"body" ());
+      ]
+
+  let lint t = parse_jekyll of_yaml t
+
+  let folder =
+    let fields = widget_of_t in
+    Netlify.Collection.Folder.make ~name:"workshops" ~create:true
+      ~format:Yaml_frontmatter ~label:"Workshops" ~folder:path ~fields ()
+end

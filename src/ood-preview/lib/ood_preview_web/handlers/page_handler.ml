@@ -67,6 +67,26 @@ let tutorials req =
   let slug = Ood_preview.Tutorial.slug first in
   Dream.redirect req ("/tutorials/" ^ slug)
 
+let workshop req =
+  let slug = Dream.param "id" req in
+  let workshops = Ood_preview.Workshop.all () in
+  match Ood_preview.Workshop.get_by_slug slug with
+  | Some workshop ->
+    Layout_template.render
+      ~title:workshop.Ood_preview.Workshop.title
+      (Workshop_template.render workshops workshop)
+    |> Dream.html
+  | None ->
+    Dream.not_found req
+
+let workshops req =
+  let first =
+    Ood_preview.Workshop.all () |> fun list ->
+    List.nth list (List.length list - 1)
+  in
+  let slug = Ood_preview.Workshop.slug first in
+  Dream.redirect req ("/workshops/" ^ slug)
+
 let tools _req =
   let tools = Ood_preview.Tool.all () in
   Layout_template.render ~title:"Tools" (Platform_template.render tools)

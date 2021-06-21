@@ -69,3 +69,18 @@ module Academic_institution : sig
 
   include S.FolderData with type t := t
 end
+
+module Workshop : sig
+  type role = [%import: Ood.Workshop.role] [@@deriving yaml]
+
+  type important_date = [%import: Ood.Workshop.important_date] [@@deriving yaml]
+
+  type committee_member = [%import: Ood.Workshop.committee_member]
+  [@@deriving yaml]
+
+  type presentation = [%import: Ood.Workshop.presentation] [@@deriving yaml]
+
+  type t = [%import: Ood.Workshop.t] [@@deriving yaml]
+
+  include S.FolderData with type t := t
+end
